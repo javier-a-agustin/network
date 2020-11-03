@@ -1,10 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Post, Comment
 
 
 def index(request):
@@ -61,3 +61,27 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
+def posts(request):
+    if request.method == "GET":
+        try:
+            queryset = Post.objects.order_by('-timestamp').all()
+            print(queryset)
+            return JsonResponse([post.serialize() for post in queryset], safe=False)
+        except:
+            return JsonResponse({
+                "error": "An error ocurred. Try later"
+            })
+        
+
+def get_comments(request, id):
+    if request.method == "GET":
+        try:
+            queryset = Comment.objects.filter(post=id).order_by('-timestamp').all()
+            return JsonResponse([comment.serialize() for comment in queryset], safe=False)
+        except:
+            return JsonResponse({
+                "error": f"Post with id {id} does not exist."
+            }, status=400)
+        

@@ -1,5 +1,22 @@
 {% extends "network/layout.html" %}
 
+
 {% block body %}
-    TODO
+
+    {% if user.is_authenticated %}
+        <form>
+            <textarea ></textarea>
+            <input type='submit' class='btn btn-dark' />
+        </form>
+    {% endif %}   
+
+    <div id="posts"></div>
+
+    <div id="post"></div>
+
+    <div id="profile"></div>
+
+    <div id="edit"></div>
+
 {% endblock %}
+
