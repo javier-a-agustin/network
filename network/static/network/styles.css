@@ -1,9 +1,59 @@
-
+body {
+    display: flex;
+}
 
 .post_container{ 
-    width: 80%;
+    width: 600px;
+    padding: 40px;
+    border: 1px solid grey;
+    position: relative;
+}
+
+.post_container:hover {
+    background-color: #f7f7f7;
+}
+
+.post_container .timestamp{
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}
+
+.post_container .author {
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    cursor: pointer;
+}
+
+.post_container .author:hover {
+    color: blue;
+}
+
+
+
+
+#posts {
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+}
+
+form {
+    width: 600px;
+    display: flex;
+    flex-direction: column;
     margin: 20px;
     padding: 40px;
-    border: 2px solid black;
-    border-radius: 5px;
+    
+}
+
+form textarea {
+    height: 80px;
+    margin: 40px 0 20px 0;
+}
+
+nav {
+    height: 100vh;
+    width: 300px;
+    padding: 20px;
 }

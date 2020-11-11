@@ -1,12 +1,13 @@
 {% extends "network/layout.html" %}
 
+{% load static %}
 
 {% block body %}
-
+    
     {% if user.is_authenticated %}
-        <form>
-            <textarea ></textarea>
-            <input type='submit' class='btn btn-dark' />
+        <form id='post-send'>
+            <textarea required id="post-body" name="post-body" placeholder="What's happening?"></textarea>
+            <input type='submit' class='btn btn-dark' value='Send' />
         </form>
     {% endif %}   
 
@@ -16,7 +17,15 @@
 
     <div id="profile"></div>
 
-    <div id="edit"></div>
+    <div id="following"></div>
+
+    {% if user.is_authenticated %}
+        <script>
+            const user_username = "{{ user.username }}";
+            console.log(user_username);
+        </script>
+    {% endif %}
+    <script src="{% static 'network/index.js' %}"></script>
 
 {% endblock %}
 

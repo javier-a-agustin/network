@@ -9,25 +9,24 @@
     </head>
     <body>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav>
             <a class="navbar-brand" href="#">Network</a>
           
             <div>
               <ul class="navbar-nav mr-auto">
 
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a  class="nav-link" href="#"><strong>{{ user.username }}</strong></a>
-                    </li>
-                {% endif %}
-
-                <li class="nav-item">
-                    <button class='nav-link' id="all_posts">All Posts</button>
-                </li>
+                    
                 
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Following</a>
+                        <button class='btn btn-light' onclick='showProfile("{{user.username}}", 1)' ><strong>{{ user.username }}</strong></button>
+                    </li>
+
+                    <li class="nav-item">
+                        <p class='btn btn-light' style="cursor:pointer;" onclick="load_posts(1)">All Posts</p>
+                    </li>   
+                    <li class="nav-item">
+                        <p style="cursor:pointer;" class="nav-link" onclick='following(1)'><img style="width:15px;" src="https://icongr.am/feather/users.svg?size=128&color=currentColor"> Following</p>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
@@ -48,7 +47,7 @@
             {% block body %}
             {% endblock %}
         </div>
-<script src="{% static 'network/index.js' %}"></script>
+        
 
     </body>
 </html>
