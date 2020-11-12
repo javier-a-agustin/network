@@ -7,11 +7,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import json
 
+from datetime import datetime
+
 from django.core.paginator import Paginator
 
-from .models import User, Post, Follow
+from .models import User, Post, Follow, Like
 
-NUM_PAGINATOR = 2
+NUM_PAGINATOR = 10
 
 def index(request):
     if not request.user.is_authenticated:
@@ -89,7 +91,14 @@ def posts(request, page_number):
 
         has_next = page.has_next()
         has_previous = page.has_previous()
-        return JsonResponse([ {"has_next": has_next, "has_previous": has_previous, "current_page": current_page}, [post.serialize() for post in page] ], safe=False)
+
+        posts = [post.serialize() for post in page]
+        posts_ids = [post.id for post in page]
+
+        likes = Like.objects.filter(post_id__in=posts_ids).all()
+        likes_serialized = [like.serialize() for like in likes]
+
+        return JsonResponse([ {"has_next": has_next, "has_previous": has_previous, "current_page": current_page}, posts, likes_serialized ], safe=False)
 
 
 @csrf_exempt
@@ -137,9 +146,12 @@ def get_user_data(request, username, page_number):
     has_next = page.has_next()
     has_previous = page.has_previous()
 
+    posts = [post.serialize() for post in page]
+    posts_ids = [post.id for post in page]
+    likes = Like.objects.filter(post_id__in=posts_ids).all()
+    likes_serialized = [like.serialize() for like in likes]
 
-    
-    return JsonResponse([{"has_next": has_next, "has_previous": has_previous, "current_page": current_page}, [user_data.serialize() ], [ post.serialize() for post in page ], [ follow.serialize() for follow in followers] ], safe=False)
+    return JsonResponse([{"has_next": has_next, "has_previous": has_previous, "current_page": current_page}, [user_data.serialize() ], posts, [ follow.serialize() for follow in followers], likes_serialized ], safe=False)
 
 @csrf_exempt
 @login_required
@@ -201,8 +213,70 @@ def following(request, page_number):
     has_next = page.has_next()
     has_previous = page.has_previous()
 
-    return JsonResponse([ {"has_next": has_next, "has_previous": has_previous, "current_page": current_page}, [post.serialize() for post in page] ], safe=False)
+    posts = [post.serialize() for post in page]
+    posts_ids = [post.id for post in page]
+    likes = Like.objects.filter(post_id__in=posts_ids).all()
+    likes_serialized = [like.serialize() for like in likes]
+
+    return JsonResponse([ {"has_next": has_next, "has_previous": has_previous, "current_page": current_page}, posts, likes_serialized], safe=False)
     
+@csrf_exempt
+@login_required
+def edit_post(request):
+    if request.method != "PUT":
+        return JsonResponse({"error": "only PUT requests allowed"})
+
+    data = json.loads(request.body)
+    new_body = data.get("new_body", )
+    id = data.get("id", )
+
+    try:
+        post = Post.objects.get(id=id)
+    except:
+        return JsonResponse({"error": "An error has ocurred. Try later"})
+
+    if post.author != request.user:
+        return JsonResponse({"error": "You don't have permission for editing this kinda of posts"})
+
+    post.body = new_body
+    post.edited = True
+    post.save()
+    return JsonResponse(post.serialize(), safe=False)
+
+@csrf_exempt
+@login_required
+def like(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST request allowed"})
+    
+    data = json.loads(request.body)
+    id_post = data.get("id_post", )
+    post = Post.objects.get(id=id_post)
+    
+    try:
+        item_like = Like.objects.get(post_id=id_post,user=request.user)
+        print(item_like)
+        item_like.delete()
+        user_like_post = False
+    except: 
+        print("Except")
+        item_like = Like(
+            user = request.user,
+            post = post,
+        )
+        item_like.save()
+        user_like_post = True
+    
+    likes_count = Like.objects.filter(post=post).count()
+    return JsonResponse({"post": post.serialize(), "post_likes_count": likes_count, "user_like_post": user_like_post})
+
+
+
+    
+
+
+
+        
 
 
 
