@@ -197,7 +197,7 @@ def following(request, page_number):
     try:
         following_users = Follow.objects.filter(follow_from=request.user).all()
         following_ids = [follow.follow_to.id for follow in following_users]
-        posts = Post.objects.filter(author_id__in=following_ids)
+        posts = Post.objects.filter(author_id__in=following_ids).order_by("-timestamp")
     except:
         return JsonResponse({"error": "An error has ocurred. Try later"})
 
@@ -255,11 +255,9 @@ def like(request):
     
     try:
         item_like = Like.objects.get(post_id=id_post,user=request.user)
-        print(item_like)
         item_like.delete()
         user_like_post = False
     except: 
-        print("Except")
         item_like = Like(
             user = request.user,
             post = post,
