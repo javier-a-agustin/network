@@ -1,6 +1,11 @@
 This project was created with [Django](https://www.djangoproject.com/).
 
-In order for you to be able to run the application, you must first run `pip install -r requirements.txt`
+In order for you to be able to run the application, you must first run:
+* `pip install -r requirements.txt`
+* `python manage.py makemigrations`
+* `python manage.py migrate`
+* `python manage.py runserver`
+
 
 ## Available Scripts
 
